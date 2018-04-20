@@ -202,19 +202,228 @@ groups.stream()
 
 ### 요소를 걸러내는 중간 작업
 
+```java
+List<Studen> students = new ArrayList<>();
+students.add(new Student("Haeun", 100));
+students.add(new Student("Shin", 60));
+students.add(new Student("Shion", 80));
+
+students.stream()
+    .filter(s -> s.getScore() > 70) // filter 는 조건에 일치하는 요소들만 걸러낸다.
+    .forEach(s -> System.out.println(s.getName));
+
+students.stream().stream()
+    .limit(2) // limit은 주어진 수만큼 한정한다.
+    .forEach(s -> System.out.println(s.getName()));
+```
+
+```java
+List<String> strings = new ArrayList<>();
+strings.add("Haeun");
+strings.add("Shin");
+strings.add("Shion");
+strings.add("Yongho");
+strings.add("Haeun");
+strings.add("Shin");
+
+strings.stream()
+    .distinct() // distinct는 유니크한 요소를 추출한다.
+    .forEach(System.out::println)
+```
+
 
 
 ### 요소를 정렬하는 중간 작업
 
+- sorted()
+  - 0보다 작은 값(음수)인 경우 -> 인수1의 객체가 앞으로 간다.
+  - 0보다 큰 값(양수)인 경우 -> 인수2의 객체가 앞으로 간다.
+  - 0인 경우 -> 나열 순서가 변하지 않는다.
 
+```java
+List<Students> students = new ArrayList<>();
+students.add(new Student("Ken", 100));
+students.add(new Student("Shin", 60));
+students.add(new Student("Jung", 80));
 
-
-
-
+students.stream()
+    .sorted((s1, s2) -> s2.getScore() - s1.getScore())
+    .forEach(s -> System.out.println(s.getName() + " " + s.getScore()));
+```
 
 ## Stream에 대한 '종료 작업'
 
+### 반복 처리를 실시
+
+- forEach()
+
+### 결과를 정리해서 추출
+
+- collect()
+
+  ```java
+  List<String> list = Arrays.asList("HaeunJung", "Shin", "ShionJung");
+
+  List<String> newList = list.stream()
+      .filter(p -> p.length() > 5)
+      .collect(Collectors.toList());
+  ```
+
+  - 처리 내용: 요소를 스캐닝하여 결과를 작성
+
+  - 인수: Collector
+
+  - 반환값: 인수에 넘겨진 처리(함수)에 따라 달라짐
+
+    - Collectors.toList()
+
+    - Collectors.toSet()
+
+    - Collectors.joining()
+
+      - 하나의 문자열로 결합
+
+    - Collectors.joining(String s)
+
+      - 전체 요소를 s로 넘겨받은 구분 문자를 사용해 결합
+
+    - **Collectors.groupingBy(Function T)**
+
+      - **요소를 그룹으로 나눔.**
+      - **인수는 값을 집계하는 함수**
+      - **반환은 요소를 집계한 Map**
+
+      ```java
+      List<Students> students = new ArrayList<>();
+      students.add(new Student("Ken", 100));
+      students.add(new Student("Shin", 60));
+      students.add(new Student("Yoon", 80));
+      students.add(new Student("Jung", 100));
+
+      Map<Integer, List<Student>> map = students.stream()
+          .collect(Collectors.groupingBy(Student::getScore));
+
+      List<Student> pefects = map.get(100);
+      pefects.forEach(s -> System.out.println(s.getName()));
+      ```
+
+
+- toArray()
+  - 처리 내용: 모든 요소를 배열로 변환
+  - 인수: 없음
+  - 반환값: OptionalObject[]
+- reduce()
+  - 처리 내용: 값을 집약한다.
+  - 인수: BinaryOperator(인수가 Stream 대상 객체)
+  - 반환값: Optional
+
+### 결과를 하나만 추출
+
+- findFirst()
+  - 가장 먼저 찾은 것 리턴
+- findAny()
+  - 어떤 한 요소 리턴
+- min()
+- max()
+
+### 집계 처리를 실시
+
+- count()
+- min()
+- max()
+- sum()
+- average()
+
 ## Stream API를 사용하기 위한 포인트
+
+### Stream에서 가장 많이 쓰는 것은 map, filter, collect 이다.
+
+```java
+List<String> list = Arrays.asList("AAA", "BB", "CCCC");
+
+List<String> newList = list.stream()
+    .filter(p -> p.length() > 3)
+    .map(p -> "[" + p + "]")
+    .collect(Collectors.toList());
+
+newList.forEach(System.out::println);
+
+//CCCC
+```
+
+
+
+### n번 반복하는 IntStream
+
+```java
+// StringBuilder 사용
+int count = 5;
+
+StringBuilder builder = new StringBuilder();
+for (int i = 0; i < count; i++) {
+    if (i != 0) {
+        builder.append(", ");
+    }
+    builder.append("?");
+}
+System.out.println(builder.toString());
+```
+
+```java
+// 배열을 만들어 두고 사용
+int count = 5;
+
+String[] array = new String[count];
+Arrays.fill(array, "?");
+String query = StringUtils.join(array, ", ");
+System.out.println(query);
+```
+
+```java
+// Stream 사용
+int count = 5;
+String query = IntStream.range(0, count)
+    .mapToObj(i -> "?")
+    .collect(Collectos.joining(", "));
+System.out.println(query);    
+```
+
+
+
+### List나 Map에 대한 효율적인 처리
+
+#### List에서 모든 요소에 함수를 적용하는 메서드
+
+- removeIf
+  - 인수로 주어진 함수의 결과 값이 true를 반환하는 모든 요소 제거
+- replaceAll
+  - 인수로 주어진 함수의 결과로 List의 모든 요소를 치환
+
+```java
+List<String> list = new ArrayList<>();
+list.add("HaeunJung");
+list.add("IYOU");
+list.add("ShionJung");
+
+list.removeIf(s -> s.length() <= 5);
+list.replaceAll(s -> s.toUpperCase());
+list.forEach(System.out::println);
+
+//HAEUNJUNG
+//SHIONJUNG
+```
+
+
+
+#### Map에서 모든 요소에 함수를 적용하는 메서드
+
+- compute
+  - 처리 내용: 인수로 주어진 함수의 결과를 MapDP WOTJFWJD
+  - 인수: 인수1이 키, 인수2가 BiFunction
+- computeIfPresent
+  - 처리 내용: 키가 있을 때만 인수로 주어진 함수의 결과를 Map에 재설정
+- computeIfAbsent
+  - 처리 내용: 키가 없을 때만 인수로 주어진 함수의 결과를 Map에 재설정
 
 ## Stream API를 사용하여 List 초기화하기
 
