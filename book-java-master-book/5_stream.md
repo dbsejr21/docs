@@ -427,9 +427,33 @@ list.forEach(System.out::println);
 
 ## Stream API를 사용하여 List 초기화하기
 
+of() 와 boxed() 그리고 collect를 이용해서 적절하게 List를 만들어낸다.
 
+```java
+List<Integer> integerList = IntStream.of(1, 2, 3, 4, 5).boxed()
+    .collect(Collectors.toList());
+```
 
+```java
+List<String> stringList = Stream.of("A", "B", "C").collect(Collectors.toList());
+```
 
+```java
+// 1~99
+List<Integer> integerList = IntStream.range(1, 100).boxed()
+    .collectI(Colletors.toList());
+```
 
+```java
+// 1~100
+List<Integer> integerList = IntStream.rangeClosed(1, 100).boxed()
+    .collect(Collectors.toList());
+```
 
+Stream을 통해서 배열도 만들어 낼 수 있다.
+
+```java
+Integer[] integerArray = IntStream.of(1, 2, 3, 4, 5).boxed()
+    .toArray(n -> new Integer[n]);
+```
 
