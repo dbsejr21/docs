@@ -441,8 +441,8 @@ public class DataChanger extends Subject {
     public void execute() {
         status++;
         System.out.println("상태가 " + status + "로 바뀌었다.");
+        notifyObservers();
     }
-    notifyObservers();
 }
 ```
 
