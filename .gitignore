@@ -6,3 +6,9 @@ book-java-master-book/practice/12_design_pattern/\.mvn/wrapper/
 book-java-master-book/practice/12_design_pattern/mvnw
 
 book-java-master-book/practice/12_design_pattern/mvnw\.cmd
+
+*.cmd
+
+*.iml
+
+*.class
